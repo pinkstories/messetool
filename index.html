@@ -204,6 +204,50 @@ function zeigeNeukundeFormular() {
   document.getElementById("neukundeFormular").style.display = "block";
 }
 
+
+function bestellungSpeichern() {
+  if (!bestellung.kunde || !bestellung.kunde.kundennummer) {
+    alert("Bitte zuerst einen Kunden auswählen!");
+    return;
+  }
+  const key = "bestellung_" + bestellung.kunde.kundennummer;
+  localStorage.setItem(key, JSON.stringify(bestellung));
+  alert("Bestellung gespeichert unter: " + key);
+}
+
+function zeigeGespeicherteBestellungen() {
+  const listDiv = document.getElementById("gespeicherteListe");
+  listDiv.innerHTML = "<h4>📁 Gespeicherte Bestellungen:</h4>";
+  const keys = Object.keys(localStorage).filter(k => k.startsWith("bestellung_"));
+  if (keys.length === 0) {
+    listDiv.innerHTML += "<p>Keine gespeicherten Bestellungen.</p>";
+    return;
+  }
+  keys.forEach(key => {
+    const data = JSON.parse(localStorage.getItem(key));
+    const btn = document.createElement("button");
+    btn.textContent = "#" + (data.kunde.kundennummer || "?") + " – " + (data.kunde.name || "Unbekannt");
+    btn.onclick = () => {
+      bestellung = data;
+      warenkorb = data.positionen || [];
+      aktualisiereWarenkorb();
+      document.getElementById("kundeninfo").textContent =
+        "#" + data.kunde.kundennummer + " – " + data.kunde.name;
+    };
+    const del = document.createElement("button");
+    del.textContent = "🗑️";
+    del.onclick = () => {
+      localStorage.removeItem(key);
+      zeigeGespeicherteBestellungen();
+    };
+    const wrap = document.createElement("div");
+    wrap.style.margin = "0.25rem 0";
+    wrap.appendChild(btn);
+    wrap.appendChild(del);
+    listDiv.appendChild(wrap);
+  });
+}
+
 </script>
 </body>
 </html>
