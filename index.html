@@ -16,8 +16,35 @@
 <body>
   <div class="container">
     <h1>Messe-Bestelltool</h1>
-    <input id="kundeSuche" type="text" placeholder="Kunde suchen..." />
+    
+
+
+<div style="display:flex; gap:0.5rem; align-items:center;">
+  <input id="kundeSuche" type="text" placeholder="Bestandskunde suchen..." style="flex:1; height: 2.5rem; padding: 0 1rem; font-size: 1rem; box-sizing: border-box;" />
+  <button onclick="zeigeNeukundeFormular()" style="height: 2.5rem; padding: 0 1rem; font-size: 1rem; box-sizing: border-box;">+ Neukunde anlegen</button>
+</div>
+
+
+
     <ul id="suchErgebnisse"></ul>
+<div id="neukundeFormular" style="display:none; border:1px solid #ccc; padding:1rem; margin-top:1rem;">
+  <h3>Neukunde anlegen</h3>
+  <input id="firma" placeholder="* Firmenname" />
+  <input id="vorname" placeholder="* Vorname" />
+  <input id="nachname" placeholder="* Nachname" />
+  <input id="strasse" placeholder="* Straße" />
+  <input id="plz" placeholder="* PLZ" />
+  <input id="ort" placeholder="* Ort" />
+  <select id="land">
+    <option value="Deutschland" selected>Deutschland</option>
+    <option>Österreich</option><option>Frankreich</option><option>Italien</option><option>Niederlande</option>
+  </select>
+  <input id="ustid" placeholder="USt-ID (nur EU-Ausland)" style="display:none;" />
+  <input id="telefon" placeholder="* Telefon" />
+  <input id="email" placeholder="* E-Mail" />
+  <button onclick="neukundeSpeichern()">Neukunde speichern</button>
+</div>
+
     <p id="aktuellerKunde"></p>
     <p id="sperrhinweis" style="color:red; font-weight:bold;"></p>
     <input id="scanInput" placeholder="Artikelnummer eingeben/scannen" />
@@ -36,6 +63,8 @@ let aktuellerKunde = null;
 let warenkorb = [];
 
 function setzeKunde(kunde) {
+  document.getElementById("kundeSuche").value = "";
+  document.getElementById("suchErgebnisse").innerHTML = "";
   aktuellerKunde = kunde;
   document.getElementById("aktuellerKunde").textContent = "Kunde: " + kunde.name + " (" + kunde.ort + ")";
   const sperre = kunde.gesperrt;
@@ -112,8 +141,8 @@ window.onload = () => {
 
   suchFeld.addEventListener("input", () => {
     const q = suchFeld.value.toLowerCase();
-    suchListe.innerHTML = "";
-    if (q.length < 2) return;
+    suchListe.innerHTML = ""; document.getElementById("neukundeFormular").style.display = "none";
+    if (q.length < 2) { document.getElementById("neukundeFormular").style.display = "none"; return; }
     kundenData.filter(k => k.name.toLowerCase().includes(q)).forEach(k => {
       const li = document.createElement("li");
       li.textContent = k.name + " (" + k.ort + ")" + (k.gesperrt ? " ⚠️" : "");
@@ -141,6 +170,40 @@ window.onload = () => {
     }
   });
 };
+
+document.getElementById("land").addEventListener("change", () => {
+  const l = document.getElementById("land").value;
+  document.getElementById("ustid").style.display = (l !== "Deutschland") ? "block" : "none";
+});
+
+function neukundeSpeichern() {
+  const kunde = {
+    name: document.getElementById("firma").value.trim(),
+    ort: document.getElementById("ort").value.trim(),
+    gesperrt: false,
+    telefon: document.getElementById("telefon").value.trim(),
+    email: document.getElementById("email").value.trim(),
+  };
+  if (!kunde.name || !kunde.ort || !document.getElementById("vorname").value.trim() ||
+      !document.getElementById("nachname").value.trim() ||
+      !document.getElementById("strasse").value.trim() ||
+      !document.getElementById("plz").value.trim() ||
+      !kunde.telefon || !kunde.email) {
+    alert("Bitte alle Pflichtfelder ausfüllen.");
+    return;
+  }
+  kundenData.push(kunde);
+  setzeKunde(kunde);
+  document.getElementById("neukundeFormular").style.display = "none";
+}
+
+
+function zeigeNeukundeFormular() {
+  document.getElementById("suchErgebnisse").innerHTML = "";
+  document.getElementById("kundeSuche").value = "";
+  document.getElementById("neukundeFormular").style.display = "block";
+}
+
 </script>
 </body>
 </html>
