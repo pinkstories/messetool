@@ -59,13 +59,28 @@ function updateWarenkorb() {
   const preis = document.getElementById('gesamtpreis');
   liste.innerHTML = '';
   let summe = 0;
-  warenkorb.forEach(item => {
+  warenkorb.forEach((item, index) => {
     const li = document.createElement('li');
-    li.textContent = `${item.name} × ${item.menge} = ${(item.menge * item.preis).toFixed(2)} €`;
+    const einheit = item.einheit || 'Stk';
+
+    li.innerHTML = `
+      <strong>${item.name}</strong> (${einheit})<br>
+      <button onclick="mengeAnpassen(${index}, -1)">-</button>
+      ${item.menge} × ${(item.preis).toFixed(2)} € = ${(item.menge * item.preis).toFixed(2)} €
+      <button onclick="mengeAnpassen(${index}, 1)">+</button>
+    `;
     liste.appendChild(li);
     summe += item.menge * item.preis;
   });
   preis.textContent = 'Gesamt: ' + summe.toFixed(2) + ' €';
+}
+
+function mengeAnpassen(index, richtung) {
+  const artikel = warenkorb[index];
+  const einheitMenge = artikel.vielfaches || 1;
+  artikel.menge += richtung * einheitMenge;
+  if (artikel.menge < einheitMenge) artikel.menge = einheitMenge;
+  updateWarenkorb();
 }
 
 document.getElementById('scanInput').addEventListener('keydown', (e) => {
@@ -77,10 +92,11 @@ document.getElementById('scanInput').addEventListener('keydown', (e) => {
       return;
     }
     const vorhandener = warenkorb.find(w => w.artikelnummer === nummer);
+    const vielfaches = artikel.vielfaches || 1;
     if (vorhandener) {
-      vorhandener.menge++;
+      vorhandener.menge += vielfaches;
     } else {
-      warenkorb.push({ ...artikel, menge: 1 });
+      warenkorb.push({ ...artikel, menge: vielfaches });
     }
     updateWarenkorb();
     e.target.value = '';
