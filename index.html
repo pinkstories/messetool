@@ -4,11 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Messe Bestelltool</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Messe Bestelltool</h1>
-    <p>Diese Version ist für GitHub Pages vorbereitet.</p>
+    <div class="container">
+      <h1>Messe Bestelltool</h1>
+
+      <label for="kunde">Kunde wählen:</label>
+      <select id="kundeSelect"></select>
+
+      <label for="scan">Artikelnummer scannen oder eingeben:</label>
+      <input id="scanInput" type="text" placeholder="z. B. 1002" />
+
+      <h2>Warenkorb</h2>
+      <ul id="warenkorbListe"></ul>
+      <p id="gesamtpreis"></p>
+
+      <button onclick="abschliessen()">Bestellung abschließen</button>
+    </div>
+
+    <script src="daten.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
