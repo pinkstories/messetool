@@ -10,10 +10,20 @@
     <div class="container">
       <h1>Messe Bestelltool</h1>
 
-      <label for="kunde">Kunde wählen:</label>
-      <select id="kundeSelect"></select>
+      <label for="kundeSuche">Kunde suchen oder erfassen:</label>
+      <input type="text" id="kundeSuche" placeholder="z. B. Müller" />
+      <ul id="suchErgebnisse"></ul>
 
-      <label for="scan">Artikelnummer scannen oder eingeben:</label>
+      <div id="neukundeFormular" style="display:none;">
+        <h2>Neukunde erfassen</h2>
+        <input type="text" id="neukundeName" placeholder="Name" />
+        <input type="text" id="neukundeOrt" placeholder="Ort" />
+        <button onclick="neukundeSpeichern()">Speichern</button>
+      </div>
+
+      <p id="aktuellerKunde"></p>
+
+      <label for="scanInput">Artikelnummer scannen oder eingeben:</label>
       <input id="scanInput" type="text" placeholder="z. B. 1002" />
 
       <h2>Warenkorb</h2>

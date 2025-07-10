@@ -16,6 +16,17 @@ input, select {
   padding: 0.5rem;
   margin-bottom: 1rem;
 }
+ul {
+  list-style: none;
+  padding: 0;
+}
+ul li {
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+ul li:hover {
+  background: #eef;
+}
 button {
   padding: 0.5rem 1rem;
   background: #0077cc;
