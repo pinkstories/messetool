@@ -1,6 +1,8 @@
+
 let kunden = [...kundenData];
 let aktuellerKunde = null;
 let warenkorb = [];
+let bestellungen = [];
 
 const kundeSuche = document.getElementById('kundeSuche');
 const suchErgebnisse = document.getElementById('suchErgebnisse');
@@ -61,7 +63,7 @@ function updateWarenkorb() {
   let summe = 0;
   warenkorb.forEach((item, index) => {
     const einheit = item.einheit || 'Stk';
-    li = document.createElement('li');
+    const li = document.createElement('li');
     li.innerHTML = `
       <strong>${item.name}</strong> (${einheit})<br>
       <button onclick="mengeAnpassen(${index}, -1)">-</button>
@@ -116,25 +118,32 @@ function abschliessen() {
       artikelname: item.name,
       menge: item.menge,
       preis: item.preis.toFixed(2),
-      gesamtpreis: (item.menge * item.preis).toFixed(2)
+      gesamtpreis: (item.menge * item.preis).toFixed(2),
+      zeitstempel: new Date().toISOString()
     };
   });
 
-  fetch("https://script.google.com/macros/s/AKfycbwRc-hJrSCBE1GPTD7uI-h6k791SR9Uy-w2WPrJxgr-H9bJ_eJU1a-lxWGJsxUN_vzeAw/exec", {
-    method: 'POST',
-    body: JSON.stringify(daten),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(res => res.text())
-  .then(res => {
-    alert('Bestellung erfolgreich gespeichert!');
-    warenkorb = [];
-    updateWarenkorb();
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Fehler beim Senden an Google Sheets!');
-  });
+  bestellungen.push(...daten);
+  alert('Bestellung lokal gespeichert! (nicht verloren)');
+  warenkorb = [];
+  updateWarenkorb();
+}
+
+function exportiereBestellungen() {
+  if (bestellungen.length === 0) {
+    alert('Keine gespeicherten Bestellungen zum Exportieren.');
+    return;
+  }
+
+  const header = Object.keys(bestellungen[0]);
+  const rows = bestellungen.map(obj => header.map(h => JSON.stringify(obj[h] || "")));
+  const csv = [header, ...rows].map(r => r.join(",")).join("\n");
+
+  const blob = new Blob([csv], {{ type: 'text/csv' }});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'messebestellungen.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }

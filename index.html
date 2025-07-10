@@ -2,12 +2,12 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <title>Messe Bestelltool</title>
+    <title>Messe Bestelltool (CSV)</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
-      <h1>Messe Bestelltool</h1>
+      <h1>Messe Bestelltool (lokale Sicherung)</h1>
       <label for="kundeSuche">Kunde suchen oder erfassen:</label>
       <input type="text" id="kundeSuche" placeholder="z. B. Müller" />
       <ul id="suchErgebnisse"></ul>
@@ -29,6 +29,8 @@
       <p id="gesamtpreis"></p>
 
       <button onclick="abschliessen()">Bestellung abschließen</button>
+      <hr>
+      <button onclick="exportiereBestellungen()">📤 Alle Bestellungen als CSV exportieren</button>
     </div>
 
     <script src="daten.js"></script>
