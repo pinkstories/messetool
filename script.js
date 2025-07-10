@@ -120,7 +120,7 @@ function abschliessen() {
     };
   });
 
-  fetch("https://script.google.com/macros/s/AKfycbwADk5_RTDQVJfVgujPMklI6pUYkeQ7rcMCpV_9ZOdt2PZ6CnuJ8GbaCrBE6UlVsE1lGA/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwRc-hJrSCBE1GPTD7uI-h6k791SR9Uy-w2WPrJxgr-H9bJ_eJU1a-lxWGJsxUN_vzeAw/exec", {
     method: 'POST',
     body: JSON.stringify(daten),
     headers: {
