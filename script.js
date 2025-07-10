@@ -60,13 +60,12 @@ function updateWarenkorb() {
   liste.innerHTML = '';
   let summe = 0;
   warenkorb.forEach((item, index) => {
-    const li = document.createElement('li');
     const einheit = item.einheit || 'Stk';
-
+    li = document.createElement('li');
     li.innerHTML = `
       <strong>${item.name}</strong> (${einheit})<br>
       <button onclick="mengeAnpassen(${index}, -1)">-</button>
-      ${item.menge} × ${(item.preis).toFixed(2)} € = ${(item.menge * item.preis).toFixed(2)} €
+      ${item.menge} × ${item.preis.toFixed(2)} € = ${(item.menge * item.preis).toFixed(2)} €
       <button onclick="mengeAnpassen(${index}, 1)">+</button>
     `;
     liste.appendChild(li);
@@ -108,7 +107,34 @@ function abschliessen() {
     alert('Bitte zuerst einen Kunden auswählen!');
     return;
   }
-  alert(`Bestellung abgeschlossen für ${aktuellerKunde.name}. Artikelanzahl: ${warenkorb.length}`);
-  warenkorb = [];
-  updateWarenkorb();
+
+  const daten = warenkorb.map(item => {
+    return {
+      kundenname: aktuellerKunde.name,
+      ort: aktuellerKunde.ort,
+      artikelnummer: item.artikelnummer,
+      artikelname: item.name,
+      menge: item.menge,
+      preis: item.preis.toFixed(2),
+      gesamtpreis: (item.menge * item.preis).toFixed(2)
+    };
+  });
+
+  fetch("https://script.google.com/macros/s/AKfycbwADk5_RTDQVJfVgujPMklI6pUYkeQ7rcMCpV_9ZOdt2PZ6CnuJ8GbaCrBE6UlVsE1lGA/exec", {
+    method: 'POST',
+    body: JSON.stringify(daten),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(res => res.text())
+  .then(res => {
+    alert('Bestellung erfolgreich gespeichert!');
+    warenkorb = [];
+    updateWarenkorb();
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Fehler beim Senden an Google Sheets!');
+  });
 }
