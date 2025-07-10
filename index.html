@@ -1,41 +1,62 @@
-
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Messe Bestelltool (CSV)</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="container">
-      <h1>Messe Bestelltool (lokale Sicherung)</h1>
-      <label for="kundeSuche">Kunde suchen oder erfassen:</label>
-      <input type="text" id="kundeSuche" placeholder="z. B. Müller" />
-      <ul id="suchErgebnisse"></ul>
+<head>
+  <meta charset="UTF-8" />
+  <title>Messe Tool - Vollversion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Messe-Bestelltool</h1>
 
-      <div id="neukundeFormular" style="display:none;">
-        <h2>Neukunde erfassen</h2>
-        <input type="text" id="neukundeName" placeholder="Name" />
-        <input type="text" id="neukundeOrt" placeholder="Ort" />
-        <button onclick="neukundeSpeichern()">Speichern</button>
-      </div>
+    <label for="kundeSuche">Kunde suchen oder erfassen:</label>
+    <input type="text" id="kundeSuche" placeholder="z. B. Müller" />
+    <ul id="suchErgebnisse"></ul>
 
-      <p id="aktuellerKunde"></p>
-      <div id="sperrhinweis" style="color:red; font-weight:bold;"></div>
-
-      <label for="scanInput">Artikelnummer scannen oder eingeben:</label>
-      <input id="scanInput" type="text" placeholder="z. B. 1002" />
-
-      <h2>Warenkorb</h2>
-      <ul id="warenkorbListe"></ul>
-      <p id="gesamtpreis"></p>
-
-      <button onclick="abschliessen()">Bestellung abschließen</button>
-      <hr>
-      <button onclick="exportiereBestellungen()">📤 Alle Bestellungen als CSV exportieren</button>
+    <div id="neukundeFormular" style="display:none;">
+      <h2>Neukunde erfassen</h2>
+      <input type="text" id="firma" placeholder="* Firmenname" required />
+      <input type="text" id="vorname" placeholder="* Vorname" required />
+      <input type="text" id="nachname" placeholder="* Nachname" required />
+      <input type="text" id="strasse" placeholder="* Straße" required />
+      <input type="text" id="plz" placeholder="* PLZ" required />
+      <input type="text" id="ort" placeholder="* Ort" required />
+      <select id="land">
+        <option value="Deutschland" selected>Deutschland</option>
+        <option value="Österreich">Österreich</option>
+        <option value="Schweiz">Schweiz</option>
+        <option value="Frankreich">Frankreich</option>
+        <option value="Italien">Italien</option>
+        <option value="Niederlande">Niederlande</option>
+      </select>
+      <input type="text" id="ustid" placeholder="USt-IdNr." style="display:none;" />
+      <input type="text" id="telefon" placeholder="* Telefon" required />
+      <input type="email" id="email" placeholder="* E-Mail" required />
+      <button onclick="neukundeSpeichern()">Neukunde speichern</button>
     </div>
 
-    <script src="daten.js"></script>
-    <script src="script.js"></script>
-  </body>
+    <p id="aktuellerKunde"></p>
+    <div id="sperrhinweis" style="color:red; font-weight:bold;"></div>
+
+    <label for="scanInput">Artikelnummer scannen oder eingeben:</label>
+    <input id="scanInput" type="text" placeholder="z. B. 1002" />
+
+    <h2>Warenkorb</h2>
+    <ul id="warenkorbListe"></ul>
+    <p id="gesamtpreis"></p>
+
+    <label for="lieferdatum">Gewünschter Liefertermin:</label>
+    <input type="date" id="lieferdatum" />
+
+    <label for="kommentar">Kommentare oder Wünsche:</label>
+    <textarea id="kommentar" placeholder="optional"></textarea>
+
+    <button onclick="abschliessen()">✅ Bestellung abschließen</button>
+    <hr>
+    <button onclick="exportiereBestellungen()">📤 Alle Bestellungen als CSV exportieren</button>
+  </div>
+
+  <script src="daten.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>

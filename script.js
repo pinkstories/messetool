@@ -8,6 +8,13 @@ const kundeSuche = document.getElementById('kundeSuche');
 const suchErgebnisse = document.getElementById('suchErgebnisse');
 const aktuellerKundeAnzeige = document.getElementById('aktuellerKunde');
 const sperrhinweis = document.getElementById('sperrhinweis');
+const ustidFeld = document.getElementById('ustid');
+const landDropdown = document.getElementById('land');
+
+landDropdown.addEventListener('change', () => {
+  const land = landDropdown.value;
+  ustidFeld.style.display = (land !== "Deutschland" && ["Österreich", "Frankreich", "Italien", "Niederlande"].includes(land)) ? "block" : "none";
+});
 
 kundeSuche.addEventListener('input', () => {
   const query = kundeSuche.value.toLowerCase().trim();
@@ -35,7 +42,7 @@ kundeSuche.addEventListener('input', () => {
     li.textContent = `${k.name} (${k.ort})`;
     li.onclick = () => {
       aktuellerKunde = k;
-      aktuellerKundeAnzeige.textContent = `Aktueller Kunde: ${k.name} (${k.ort})`;
+      aktuellerKundeAnzeige.textContent = `Kunde: ${k.name} (${k.ort})`;
       sperrhinweis.textContent = k.gesperrt ? '⚠️ Achtung: Dieser Kunde ist gesperrt!' : '';
       suchErgebnisse.innerHTML = '';
       kundeSuche.value = '';
@@ -45,16 +52,36 @@ kundeSuche.addEventListener('input', () => {
 });
 
 function neukundeSpeichern() {
-  const name = document.getElementById('neukundeName').value.trim();
-  const ort = document.getElementById('neukundeOrt').value.trim();
-  if (!name || !ort) {
-    alert('Bitte Name und Ort eingeben.');
+  const firma = document.getElementById('firma').value.trim();
+  const vorname = document.getElementById('vorname').value.trim();
+  const nachname = document.getElementById('nachname').value.trim();
+  const strasse = document.getElementById('strasse').value.trim();
+  const plz = document.getElementById('plz').value.trim();
+  const ort = document.getElementById('ort').value.trim();
+  const land = document.getElementById('land').value.trim();
+  const ustid = document.getElementById('ustid').value.trim();
+  const telefon = document.getElementById('telefon').value.trim();
+  const email = document.getElementById('email').value.trim();
+
+  if (!firma || !vorname || !nachname || !strasse || !plz || !ort || !telefon || !email) {
+    alert('Bitte alle Pflichtfelder ausfüllen.');
     return;
   }
-  const k = { name, ort, gesperrt: false };
+
+  if (land !== "Deutschland" && ustidFeld.style.display === "block" && ustid === "") {
+    alert('Bitte USt-IdNr. eingeben.');
+    return;
+  }
+
+  const k = {
+    name: firma,
+    ort,
+    gesperrt: false,
+    vorname, nachname, strasse, plz, land, ustid, telefon, email
+  };
   kunden.push(k);
   aktuellerKunde = k;
-  aktuellerKundeAnzeige.textContent = `Neukunde: ${k.name} (${k.ort})`;
+  aktuellerKundeAnzeige.textContent = `Neukunde: ${firma} (${ort})`;
   sperrhinweis.textContent = '';
   document.getElementById('neukundeFormular').style.display = 'none';
 }
@@ -69,9 +96,9 @@ function updateWarenkorb() {
     const li = document.createElement('li');
     li.innerHTML = `
       <strong>${item.name}</strong> (${einheit})<br>
-      <button onclick="mengeAnpassen(${index}, -1)">-</button>
+      <button class="red" onclick="mengeAnpassen(${index}, -1)">-</button>
       ${item.menge} × ${item.preis.toFixed(2)} € = ${(item.menge * item.preis).toFixed(2)} €
-      <button onclick="mengeAnpassen(${index}, 1)">+</button>
+      <button class="green" onclick="mengeAnpassen(${index}, 1)">+</button>
     `;
     liste.appendChild(li);
     summe += item.menge * item.preis;
@@ -83,7 +110,9 @@ function mengeAnpassen(index, richtung) {
   const artikel = warenkorb[index];
   const einheitMenge = artikel.vielfaches || 1;
   artikel.menge += richtung * einheitMenge;
-  if (artikel.menge < einheitMenge) artikel.menge = einheitMenge;
+  if (artikel.menge < einheitMenge) {
+    warenkorb.splice(index, 1);
+  }
   updateWarenkorb();
 }
 
@@ -109,9 +138,12 @@ document.getElementById('scanInput').addEventListener('keydown', (e) => {
 
 function abschliessen() {
   if (!aktuellerKunde) {
-    alert('Bitte zuerst einen Kunden auswählen!');
+    alert('Bitte zuerst einen Kunden auswählen oder erfassen!');
     return;
   }
+
+  const lieferdatum = document.getElementById('lieferdatum').value;
+  const kommentar = document.getElementById('kommentar').value;
 
   const daten = warenkorb.map(item => {
     return {
@@ -122,21 +154,63 @@ function abschliessen() {
       menge: item.menge,
       preis: item.preis.toFixed(2),
       gesamtpreis: (item.menge * item.preis).toFixed(2),
+      lieferdatum,
+      kommentar,
       zeitstempel: new Date().toISOString()
     };
   });
 
   bestellungen.push(...daten);
-  alert('Bestellung lokal gespeichert! (nicht verloren)');
+  alert('Bestellung gespeichert!');
   warenkorb = [];
   updateWarenkorb();
 }
+
 
 function exportiereBestellungen() {
   if (bestellungen.length === 0) {
     alert('Keine gespeicherten Bestellungen zum Exportieren.');
     return;
   }
+
+  const rows = bestellungen.map(obj => [
+    obj.kundenname,
+    obj.ort,
+    obj.artikelnummer,
+    obj.artikelname,
+    obj.menge,
+    obj.preis,
+    obj.gesamtpreis,
+    obj.lieferdatum,
+    obj.kommentar
+  ]);
+  const header = [
+    "Kunde",
+    "Ort",
+    "Artikelnummer",
+    "Artikelbezeichnung",
+    "Menge",
+    "Einzelpreis netto",
+    "Gesamtpreis netto",
+    "Lieferdatum",
+    "Kommentar"
+  ];
+
+  const csv = [header, ...rows].map(row =>
+    row.map(field => typeof field === "string" ? '"' + field.replace(/"/g, '""') + '"' : field)
+    .join(";")
+  ).join("
+");
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'weclapp_bestellungen.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 
   const header = Object.keys(bestellungen[0]);
   const rows = bestellungen.map(obj => header.map(h => JSON.stringify(obj[h] || "")));
