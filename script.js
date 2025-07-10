@@ -7,6 +7,7 @@ let bestellungen = [];
 const kundeSuche = document.getElementById('kundeSuche');
 const suchErgebnisse = document.getElementById('suchErgebnisse');
 const aktuellerKundeAnzeige = document.getElementById('aktuellerKunde');
+const sperrhinweis = document.getElementById('sperrhinweis');
 
 kundeSuche.addEventListener('input', () => {
   const query = kundeSuche.value.toLowerCase().trim();
@@ -35,6 +36,7 @@ kundeSuche.addEventListener('input', () => {
     li.onclick = () => {
       aktuellerKunde = k;
       aktuellerKundeAnzeige.textContent = `Aktueller Kunde: ${k.name} (${k.ort})`;
+      sperrhinweis.textContent = k.gesperrt ? '⚠️ Achtung: Dieser Kunde ist gesperrt!' : '';
       suchErgebnisse.innerHTML = '';
       kundeSuche.value = '';
     };
@@ -49,10 +51,11 @@ function neukundeSpeichern() {
     alert('Bitte Name und Ort eingeben.');
     return;
   }
-  const k = { name, ort };
+  const k = { name, ort, gesperrt: false };
   kunden.push(k);
   aktuellerKunde = k;
   aktuellerKundeAnzeige.textContent = `Neukunde: ${k.name} (${k.ort})`;
+  sperrhinweis.textContent = '';
   document.getElementById('neukundeFormular').style.display = 'none';
 }
 
@@ -139,7 +142,7 @@ function exportiereBestellungen() {
   const rows = bestellungen.map(obj => header.map(h => JSON.stringify(obj[h] || "")));
   const csv = [header, ...rows].map(r => r.join(",")).join("\n");
 
-  const blob = new Blob([csv], {{ type: 'text/csv' }});
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
